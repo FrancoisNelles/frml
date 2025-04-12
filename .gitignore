@@ -174,3 +174,4 @@ cython_debug/
 .pypirc
 
 # Additional testing playgrounds
+playground.py
