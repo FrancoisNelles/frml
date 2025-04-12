@@ -1,2 +1,5 @@
 # frml
-This library is a Financial Risk Modelling Library
+This library is an open source Financial Risk Modelling Library
+
+# TODO:
+Project Overview, Installation Instructions, Usage Examples, Contributing Guidelines, License Information
