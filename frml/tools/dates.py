@@ -24,6 +24,10 @@ def calculate_year_fraction(
         - year_fraction (float): The year fraction for the given dates.
 
     Notes:
+        - The calculations follow ISDA conventions.
+        - The 30/360 conventions rely on the following rulesets:
+            - 30/360E: European method, where the last day of February is always considered to be the 30th.
+            - 30/360A: American method, where the last day of February is considered to be the 30th only if the start date is on or after the 30th.
 
     """
     if day_count not in Dates.day_count_list:
@@ -54,16 +58,34 @@ def calculate_year_fraction(
                 day_counts.append(days / 365)
             
             date_1 = date_2
-        return sign * sum(day_counts)
+        year_fraction =  sign * sum(day_counts)
 
     if day_count == "Actual/365":
-        return sign * (end_date - start_date).days / 365.0
+        year_fraction =  sign * (end_date - start_date).days / 365.0
 
     if day_count == "Actual/360":
-        return sign * (end_date - start_date).days / 360.0
+        year_fraction =  sign * (end_date - start_date).days / 360.0
 
     if day_count == "30/360E":
-        # TODO:
+        y1, m1, d1 = start_date.year, start_date.month, start_date.day
+        y2, m2, d2 = end_date.year, end_date.month, end_date.day
+
+        if d1 == 31:
+            d1 = 30
+        if d2 == 31:
+            d2 = 30
+
+        year_fraction = sign * 360*(y2 - y1) + 30*(m2 - m1) + (d2 - d1)
 
     if day_count == "30/360A":
-        # TODO:
+        y1, m1, d1 = start_date.year, start_date.month, start_date.day
+        y2, m2, d2 = end_date.year, end_date.month, end_date.day
+
+        if d1 == 31 or (m1 == 2 and d1 == 29):
+            d1 = 30
+        if d2 == 31 and d1 > 29:
+            d2 = 30
+
+        year_fraction = sign * 360*(y2 - y1) + 30*(m2 - m1) + (d2 - d1)
+
+    return year_fraction
