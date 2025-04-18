@@ -24,14 +24,7 @@ def calculate_year_fraction(
         - year_fraction (float): The year fraction for the given dates.
 
     Notes:
-        - Year fraction convention 30/360E follows the European convention. This
-            convention applies bigger weights to the 1st day of a month depending on how many
-            days were in the previous month. The 31st counts as a 0 day weight. The American
-            convention allocates weights to the days slightly differently.
-        - Year fraction convention 30/360A follows the European convention. This
-            convention applies bigger weights to the 1st day of a month depending on how many
-            days were in the previous month. The 31st counts as a 0 day weight. The American
-            convention allocates weights to the days slightly differently.
+
     """
     if day_count not in Dates.day_count_list:
         raise ValueError(f"DayCountConventions {day_count} does not exist!")
@@ -43,17 +36,23 @@ def calculate_year_fraction(
         sign = 1
 
     if day_count == "Actual/Actual":
+        
         day_counts = []
         date_1 = start_date
+
         for i in range(start_date.year, end_date.year + 1):
-            date_2 = date(i + 1, 1, 1)
+            date_2 = date(i+1, 1, 1)
+            
             if end_date < date_2:
                 date_2 = end_date
+            
             days = (date_2 - date_1).days
+            
             if calendar.isleap(date_1.year):
                 day_counts.append(days / 366)
             else:
                 day_counts.append(days / 365)
+            
             date_1 = date_2
         return sign * sum(day_counts)
 
@@ -64,9 +63,7 @@ def calculate_year_fraction(
         return sign * (end_date - start_date).days / 360.0
 
     if day_count == "30/360E":
-        # Matches European convention
-        years = end_date.year - start_date.year
-        months = end_date.month - start_date.month
-        calculated_months = (12 * years + months) * 30
-        days = min(30, end_date.day) - min(30, start_date.day)
-        return sign * (calculated_months + days) / 360
+        # TODO:
+
+    if day_count == "30/360A":
+        # TODO:
