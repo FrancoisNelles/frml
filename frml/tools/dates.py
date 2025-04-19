@@ -75,7 +75,7 @@ def calculate_year_fraction(
         if d2 == 31:
             d2 = 30
 
-        year_fraction = sign * 360*(y2 - y1) + 30*(m2 - m1) + (d2 - d1)
+        year_fraction = sign * (360*(y2 - y1) + 30*(m2 - m1) + (d2 - d1))/360
 
     if day_count == "30/360A":
         y1, m1, d1 = start_date.year, start_date.month, start_date.day
@@ -86,6 +86,6 @@ def calculate_year_fraction(
         if d2 == 31 and d1 > 29:
             d2 = 30
 
-        year_fraction = sign * 360*(y2 - y1) + 30*(m2 - m1) + (d2 - d1)
+        year_fraction = sign * (360*(y2 - y1) + 30*(m2 - m1) + (d2 - d1))/360
 
     return year_fraction
