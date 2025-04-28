@@ -1,20 +1,21 @@
 import calendar
-from datetime import date
+import os
 import pandas as pd
+from datetime import date 
+from dateutil.relativedelta import relativedelta
 from frml.tools.calendars import CalendarMemory
 from frml.input_helpers.tools import (Calendars,
                                         Dates)
 
-
-def get_calendar(country: Calendars.calendars) -> pd.offsets.CustomBusinessDay:
+def get_calendar(calendar: Calendars.calendars) -> pd.offsets.CustomBusinessDay:
     """
-    Function returns a calendar object for the country specified.
+    Function returns a calendar object for the calendar specified.
 
     Parameters:
-        - country (str): The country for which the calendar is required.
+        - calendar (Calendars.calendars): The calendar for which the calendar is required.
 
     returns:
-        - created_calendar (pd.offsets.CustomBusinessDay): A calendar object for the country
+        - created_calendar (pd.offsets.CustomBusinessDay): A calendar object for the calendar
             specified.
 
     Notes:
@@ -24,20 +25,21 @@ def get_calendar(country: Calendars.calendars) -> pd.offsets.CustomBusinessDay:
         - Calendars class to view the countries and which holidays they have.
         - CalendarMemory class to view the calendars that have been created.
     """
+    if (calendar not in Calendars.calendar_list):
+        raise ValueError(f"Calendar {calendar} not recognized. Use any of {Calendars.calendar_list}.")
+
     calendar_memory = CalendarMemory()
-    created_calendar = calendar_memory.calendar_instance_dictionary.get(country)
+    created_calendar = calendar_memory.calendar_instance_dictionary.get(calendar)
     if created_calendar is None:
         created_calendar = pd.offsets.CustomBusinessDay(
-            calendar=Calendars.calendar_sets[country]
+            calendar=Calendars.calendar_sets[calendar]
         )
-        calendar_memory.calendar_instance_dictionary[country] = created_calendar
+        calendar_memory.calendar_instance_dictionary[calendar] = created_calendar
     return created_calendar
 
-def calculate_year_fraction(
-    start_date: date,
-    end_date: date,
-    day_count: Dates.day_count_conventions
-) -> float:
+def calculate_year_fraction(start_date: date,
+                            end_date: date,
+                            day_count: Dates.day_count_conventions) -> float:
     """
     This function calculates the year fraction between two dates given a day count convention.
 
@@ -125,3 +127,342 @@ def calculate_year_fraction(
         year_fraction = sign * (360*(y2 - y1) + 30*(m2 - m1) + (d2 - d1))/360
 
     return year_fraction
+
+def adjust_date_to_tenor(base_date: date,
+                            adjust_tenor: str) -> date:
+    """
+    This function adjusts a single date with a frequency and period being the tenor.
+
+    Parameters:
+        - base_date (date): The selected date to be adjusted.
+        - adjust_tenor (str): The tenor the date should be adjusted by.
+
+    Returns:
+        - adjusted_date (date): Returns the tenor adjusted date.
+
+    Usage:
+        - The tenor convention is dictated by any amount of numbers followed by a single letter,
+            the letter dictates the period of the tenor, and the number dictates the frequency.
+
+    Notes:
+        - The tenor convention is as follows:
+            1D denotes 1 day
+            1W denotes 1 week
+            1M denotes 1 month
+            1Y denotes 1 year
+    """
+    if not isinstance(base_date, date):
+        raise TypeError(f"Base date was not of type datetime.date, but rather of {type(base_date)}.")
+    if not isinstance(adjust_tenor, str):
+        raise TypeError(f"Adjust tenor was not of type string, but rather of {type(base_date)}.")
+    if adjust_tenor[-1] not in ["D", "W", "M", "Y"]:
+        raise ValueError(
+            f"Tenor {adjust_tenor} not recognized. Please provide a valid tenor value."
+        )
+
+    frequency = int(adjust_tenor[0:-1])
+    tenor = adjust_tenor[-1]
+
+    if tenor == "D":
+        delta = relativedelta(days=frequency)
+    if tenor == "W":
+        delta = relativedelta(weeks=frequency)
+    if tenor == "M":
+        delta = relativedelta(months=frequency)
+    if tenor == "Y":
+        delta = relativedelta(years=frequency)
+
+    adjusted_date = base_date + delta
+    return adjusted_date
+
+def adjust_date_to_month_end(base_date: date) -> date:
+    """
+    This function adjusts a single date to the month end.
+
+    Parameters:
+        - base_date (date): The selected date to be adjusted.
+
+    Returns:
+        - adjusted_date (date): Returns the month end adjusted date.
+    """
+    if not isinstance(base_date, date):
+        raise TypeError(f"Base date was not of type datetime.date, but rather of {type(base_date)}.")
+    
+    adjusted_date = pd.to_datetime(base_date)
+    month_end_offset = pd.offsets.MonthEnd()
+
+    if not adjusted_date.is_month_end:
+        adjusted_date = adjusted_date + month_end_offset
+    
+    adjusted_date = adjusted_date.date()
+    return adjusted_date
+
+def adjust_date_to_business_convention(base_date: date,
+                                        calendar: Calendars.calendars = "South Africa",
+                                        business_day_convention: Dates.business_day_convention = "Modified Following") -> date:
+    """
+    The function adjust_date_to_business_convention adjusts a single date to the business
+    day convention of the calendar selected.
+
+    Parameters:
+        - base_date (date): The selected date to be adjusted.
+        - calendar (Calendars.calendars): The calendar for which the calendar is required.
+        - business_day_convention (Dates.business_day_convention): The business day convention of the date list.
+            The inputs are as follows:
+            Modified Following
+            Following
+            Modified Preceding
+            Preceding
+            Unadjusted
+
+    Returns:
+        - adjusted_date (date): Returns the business day convention adjusted date.
+
+    Notes:
+        - Modified Following: The dates will be adjusted to the next business day if the
+            date falls on a weekend or holiday unless the adjusted date would fall in
+            another month, then it would use preceding.
+        - Following: The dates will be adjusted to the next business day if the date falls
+            on a weekend.
+        - Modified Preceding: The dates will be adjusted to the previous business day if
+            the date falls on a weekend or holiday unless the adjusted date would fall in
+            another month, then it would use following.
+        - Preceding: The dates will be adjusted to the previous business day if the date
+            falls on a weekend.
+        - Unadjusted: The dates will not be adjusted if the date falls on a weekend.
+
+    See also:
+        - The 'DateGenerationConventions' class to view the business day conventions.
+        - The 'Calendars' class to view the countries and which holidays they have.
+    """
+    if not isinstance(base_date, date):
+        raise TypeError(f"Base date was not of type datetime.date, but rather of {type(base_date)}.")
+    if (calendar not in Calendars.calendar_list):
+        raise ValueError(f"Calendar {calendar} not recognized. Use any of {Calendars.calendar_list}.")
+    if (business_day_convention not in Dates.business_day_convention_list):
+        raise ValueError(f"Business day convention {business_day_convention} not recognized. Use any of {Dates.business_day_convention_list}.")
+
+    business_day_offset = get_calendar(calendar)
+    adjusted_date = pd.to_datetime(base_date)
+
+    if business_day_convention == "Modified Following":
+        adjusted_date = [
+            (
+                business_day_offset.rollforward(adjusted_date)
+                if business_day_offset.rollforward(adjusted_date).month == adjusted_date.month
+                else business_day_offset.rollback(adjusted_date)
+            )
+        ][0]
+    if business_day_convention == "Following":
+        adjusted_date = [business_day_offset.rollforward(adjusted_date)][0]
+    if business_day_convention == "Modified Preceding":
+        adjusted_date = [
+            (
+                business_day_offset.rollback(adjusted_date)
+                if business_day_offset.rollback(adjusted_date).month == adjusted_date.month
+                else business_day_offset.rollforward(adjusted_date)
+            )
+        ][0]
+    if business_day_convention == "Preceding":
+        adjusted_date = [business_day_offset.rollback(adjusted_date)][0]
+    
+    adjusted_date = pd.to_datetime(adjusted_date).date()
+    return adjusted_date
+
+def adjust_date(base_date: date,
+                adjust_tenor: str,
+                calendar: Calendars.calendars = "South Africa",
+                business_day_convention: Dates.business_day_convention = "Modified Following",
+                end_of_month: bool = False) -> date:
+    """
+    Adjust a single date with a frequency and period being the tenor,
+    a month end adjustment and a business day convention.
+
+    Parameters:
+        - base_date (date): The selected date to be adjusted.
+        - adjust_tenor (str): The tenor the date should be adjusted by.
+        - calendar (Calendars.calendars): The calendar for which the calendar is required.
+        - business_day_convention (Dates.business_day_convention): The business day convention of the date list.
+            The inputs are as follows:
+            Modified Following
+            Following
+            Modified Preceding
+            Preceding
+            Unadjusted
+        - end_of_month (boolean): True or False. If True, the dates will be adjusted to the
+            last day of the month.
+
+    Returns:
+        - adjusted_date (date): Returns the tenor adjusted date.
+
+    Usage:
+        - The tenor convention is dictated by any amount of numbers followed by a single letter,
+            the letter dictates the period of the tenor, and the number dictates the frequency.
+
+    Notes:
+        - The tenor convention is as follows:
+            1D denotes 1 day
+            1W denotes 1 week
+            1M denotes 1 month
+            1Y denotes 1 year
+        - Modified Following: The dates will be adjusted to the next business day if the
+            date falls on a weekend or holiday unless the adjusted date would fall in
+            another month, then it would use preceding.
+        - Following: The dates will be adjusted to the next business day if the date falls
+            on a weekend.
+        - Modified Preceding: The dates will be adjusted to the previous business day if
+            the date falls on a weekend or holiday unless the adjusted date would fall in
+            another month, then it would use following.
+        - Preceding: The dates will be adjusted to the previous business day if the date
+            falls on a weekend.
+        - Unadjusted: The dates will not be adjusted if the date falls on a weekend.
+
+        See also:
+        - The 'Dates' class to view the business day conventions.
+        - The 'Calendars' class to view the countries and which holidays they have.
+        - The 'adjust_date_to_tenor' function for the tenor adjustment.
+        - The 'adjust_date_to_month_end' function for the month end adjustment.
+        - The 'adjust_date_to_business_convention' function for the business day convention
+            adjustment.
+    """
+    if not isinstance(base_date, date):
+        raise TypeError(f"Base date was not of type datetime.date, but rather of {type(base_date)}.")
+    if adjust_tenor[-1] not in ["D", "W", "M", "Y"]:
+        raise ValueError(f"Tenor {adjust_tenor} not recognized. Please provide a valid tenor value.")
+    if (calendar not in Calendars.calendar_list):
+        raise ValueError(f"Calendar {calendar} not recognized. Use any of {Calendars.calendar_list}.")
+    if (business_day_convention not in Dates.business_day_convention_list):
+        raise ValueError(f"Business day convention {business_day_convention} not recognized. Use any of {Dates.business_day_convention_list}.")
+    if (end_of_month not in [True, False]):
+        raise ValueError(f"End of the month setting {end_of_month} not recognized. It must be set to True or False.")
+
+    adjusted_date = adjust_date_to_tenor(base_date,
+                                            adjust_tenor)
+    if end_of_month:
+        adjusted_date = adjust_date_to_month_end(adjusted_date)
+    
+    adjusted_date = adjust_date_to_business_convention(adjusted_date,
+                                                        calendar,
+                                                        business_day_convention)
+    return adjusted_date
+
+def generate_dates_list(start_date: date,
+                        end_date: date,
+                        tenor: str,
+                        date_generation_method: Dates.date_generation_method = "Backwards",
+                        calendar: Calendars.calendars = "South Africa",
+                        business_day_convention: Dates.business_day_convention = "Modified Following",
+                        end_of_month: bool = False) -> list[date]:
+    """
+    This function creates a list of dates with a frequency and period being the tenor, with optional adjustments like a
+    a month end adjustment and a business day convention adjustment.
+
+    Parameters:
+        - start_date (date): The date at which the list should start.
+        - end_date (date): The date at which the list should end.
+        - tenor (str): The tenor the dates should be adjusted by.
+        - date_generation_method (Dates.date_generation_method): The date generation method of the date list.
+            The inputs are as follows:
+            Backwards
+            Forwards
+        - calendar (Calendars.calendars): The calendar for which the calendar is required.
+        - business_day_convention (Dates.business_day_convention): The business day convention of the date list.
+            The inputs are as follows:
+            Modified Following
+            Following
+            Modified Preceding
+            Preceding
+            Unadjusted
+        - end_of_month (boolean): True or False. If True, the dates will be adjusted to the
+            last day of the month.
+
+    Returns:
+        - adjusted_date (list[date]): Returns a list of dates.
+
+    Usage:
+        - The list of dates generated follow the input ruleset.
+
+    Notes:
+        - Start date should be less than End date, for Date Generation logic.
+        - The tenor convention is as follows:
+            1D denotes 1 day
+            1W denotes 1 week
+            1M denotes 1 month
+            1Y denotes 1 year
+        - Forward denotes a short stub at the end of the list.
+        - Backward denotes a short stub at the beginning of the list.
+        - Modified Following: The dates will be adjusted to the next business day if the
+            date falls on a weekend or holiday unless the adjusted date would fall in
+            another month, then it would use preceding.
+        - Following: The dates will be adjusted to the next business day if the date falls
+            on a weekend.
+        - Modified Preceding: The dates will be adjusted to the previous business day if
+            the date falls on a weekend or holiday unless the adjusted date would fall in
+            another month, then it would use following.
+        - Preceding: The dates will be adjusted to the previous business day if the date
+            falls on a weekend.
+        - Unadjusted: The dates will not be adjusted if the date falls on a weekend.
+
+    See also:
+        - The 'Calendars' class to view the countries and which holidays they have.
+        - The 'Date' class to view the date generation method.
+        - The 'Date' class to view the business day conventions.
+        - The 'adjust_date' function for the adjustment calculation.
+    """
+    if not isinstance(start_date, date):
+        raise TypeError(f"Start date was not of type datetime.date, but rather of {type(start_date)}.")
+    if not isinstance(end_date, date):
+        raise TypeError(f"End date was not of type datetime.date, but rather of {type(end_date)}.")
+    if start_date > end_date:
+        raise ValueError(f"Start date, {start_date}, cannot be after end date, {end_date}. Rather use a negative tenor.")
+    if tenor[-1] not in ["D", "W", "M", "Y"]:
+        raise ValueError(f"Tenor {tenor} not recognized. Please provide a valid tenor value.")
+    if (date_generation_method not in Dates.date_generation_method_list):
+        raise ValueError(f"Date generation method, {date_generation_method}, not recognized. Use any of {Dates.date_generation_method}.")
+    if (calendar not in Calendars.calendar_list):
+        raise ValueError(f"Calendar {calendar} not recognized. Use any of {Calendars.calendar_list}.")
+    if (business_day_convention not in Dates.business_day_convention_list):
+        raise ValueError(f"Business day convention {business_day_convention} not recognized. Use any of {Dates.business_day_convention_list}.")
+    if (end_of_month not in [True, False]):
+        raise ValueError(f"End of the month setting {end_of_month} not recognized. It must be set to True or False.")
+
+    dates_list = []
+
+    if date_generation_method == "Backwards":
+        start_date, end_date = end_date, start_date
+        if tenor[0] == '-':
+            tenor == tenor[1:]
+        else:
+            tenor = '-'+tenor
+
+        list_date = start_date
+
+        while list_date > end_date:
+            dates_list.append(list_date)
+            list_date = adjust_date(list_date,
+                                    tenor,
+                                    calendar,
+                                    business_day_convention,
+                                    end_of_month)
+            
+    if date_generation_method == "Forwards":
+
+        list_date = start_date
+
+        while list_date < end_date:
+            dates_list.append(list_date)
+            list_date = adjust_date(list_date,
+                                    tenor,
+                                    calendar,
+                                    business_day_convention,
+                                    end_of_month)
+
+    dates_list.append(end_date)
+
+    if date_generation_method == "Backwards":
+        dates_list.reverse()
+
+    #Remove any duplicates
+    dates_list = list(dict.fromkeys(dates_list))
+
+    return dates_list

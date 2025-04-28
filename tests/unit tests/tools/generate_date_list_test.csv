@@ -1,0 +1,13 @@
+start_date,end_date,tenor-date,generation_method,calendar,business_day_convention,end_of_month,generated_dates_list
+2023-04-27,2023-05-02,1D,Forwards,South Africa,Unadjusted,False,2023-04-27|2023-04-28|2023-04-29|2023-04-30|2023-05-01|2023-05-02
+2023-04-27,2023-05-02,1D,Backwards,South Africa,Unadjusted,False,2023-04-27|2023-04-28|2023-04-29|2023-04-30|2023-05-01|2023-05-02
+2023-01-31,2023-06-15,3M,Forwards,South Africa,Following,False,2023-01-31|2023-05-02|2023-06-15
+2023-01-31,2023-06-15,3M,Backwards,South Africa,Following,False,2023-01-31|2023-03-15|2023-06-15
+2023-06-30,2024-02-28,6M,Forwards,South Africa,Preceding,False,2023-06-30|2023-12-29|2024-02-28
+2023-06-30,2024-02-28,6M,Backwards,South Africa,Preceding,False,2023-06-30|2023-08-28|2024-02-28
+2023-06-30,2024-02-28,6M,Forwards,South Africa,Modified Following,False,2023-06-30|2023-12-29|2024-02-28
+2023-06-30,2024-02-28,6M,Forwards,South Africa,Modified Preceding,False,2023-06-30|2023-12-29|2024-02-28
+2023-12-31,2025-12-31,1Y,Forwards,South Africa,Modified Following,True,2023-12-31|2024-12-31|2025-12-31
+2022-12-30,2024-12-31,3M,Forwards,South Africa,Modified Following,True,2022-12-30|2023-03-31|2023-06-30|2023-09-29|2023-12-29|2024-03-28|2024-06-28|2024-09-30|2024-12-31
+2023-01-31,2023-02-27,2W,Forwards,South Africa,Unadjusted,False,2023-01-31|2023-02-07|2023-02-14|2023-02-21|2023-02-27
+2023-02-27,2023-01-31,-2W,Forwards,South Africa,Unadjusted,False,2023-02-27|2023-02-21|2023-02-14|2023-02-07|2023-01-31

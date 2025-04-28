@@ -39,11 +39,23 @@ class Calendars:
         "Zimbabwe": ZimbabweBusinessDays(),
     }
 
+    calendar_list = [
+        "Botswana",
+        "Ghana",
+        "Kenya",
+        "Malawi",
+        "Nigeria",
+        "No Holidays",
+        "South Africa",
+        "UnitedStatesOfAmerica_NYBusinessDays",
+        "Zimbabwe",
+    ]
+
 class Dates:
     """
     This class is intended to help populate function inputs with allowable drop down lists.
     """
-
+    # Year fraction calculation options
     day_count_conventions = Literal[
                             Literal["Actual/Actual"],
                             Literal["Actual/365"],
@@ -57,3 +69,28 @@ class Dates:
                         "Actual/360",
                         "30/360E",
                         "30/360A"]
+    
+    # Date adjustment conditions
+    business_day_convention = Literal[
+        Literal["Unadjusted"],
+        Literal["Following"],
+        Literal["Modified Following"],
+        Literal["Preceding"],
+        Literal["Modified Preceding"],
+    ]
+
+    business_day_convention_list = [
+        "Unadjusted",
+        "Following",
+        "Modified Following",
+        "Preceding",
+        "Modified Preceding",
+    ]
+
+    # Date series options
+    date_generation_method = Literal[
+        Literal["Forwards"],
+        Literal["Backwards"]
+    ]
+
+    date_generation_method_list = ["Forwards", "Backwards"]
