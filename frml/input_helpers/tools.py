@@ -1,4 +1,43 @@
 from typing import Literal
+from frml.tools.calendars import (
+    BotswanaBusinessDays,
+    GhanaBusinessDays,
+    KenyaBusinessDays,
+    MalawiBusinessDays,
+    NigeriaBusinessDays,
+    NoHolidayBusinessDays,
+    SouthAfricaBusinessDays,
+    UnitedStatesOfAmerica_NYBusinessDays,
+    ZimbabweBusinessDays,
+)
+
+class Calendars:
+    """
+    This class is intended to help populate function inputs with allowable drop down lists.
+    """
+    calendars = Literal[
+        Literal["Botswana"],
+        Literal["Ghana"],
+        Literal["Kenya"],
+        Literal["Malawi"],
+        Literal["Nigeria"],
+        Literal["No Holidays"],
+        Literal["South Africa"],
+        Literal["UnitedStatesOfAmerica_NYBusinessDays"],
+        Literal["Zimbabwe"],
+    ]
+
+    calendar_sets = {
+        "Botswana": BotswanaBusinessDays(),
+        "Ghana": GhanaBusinessDays(),
+        "Kenya": KenyaBusinessDays(),
+        "Malawi": MalawiBusinessDays(),
+        "Nigeria": NigeriaBusinessDays(),
+        "No Holidays": NoHolidayBusinessDays(),
+        "South Africa": SouthAfricaBusinessDays(),
+        "United States of America - NY": UnitedStatesOfAmerica_NYBusinessDays(),
+        "Zimbabwe": ZimbabweBusinessDays(),
+    }
 
 class Dates:
     """

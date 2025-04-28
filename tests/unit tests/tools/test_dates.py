@@ -1,8 +1,11 @@
+""" This module is to test the function in tools.dates.py."""
+
 import csv
 import pytest
 from datetime import (date,
                         datetime)
-from frml.tools.dates import calculate_year_fraction
+from frml.tools.dates import (calculate_year_fraction,
+                                get_calendar)
 
 def read_csv(file_path):
     """
@@ -13,6 +16,34 @@ def read_csv(file_path):
         next(reader)
         for row in reader:
             yield row
+
+
+@pytest.mark.parametrize(
+    "country, test_date, holiday_bool",
+    [
+        ("South Africa", datetime(2019, 1, 1), False),
+        ("South Africa", datetime(2019, 1, 2), True),
+        ("South Africa", datetime(2019, 3, 21), False),
+        ("South Africa", datetime(2019, 4, 27), False),
+        ("South Africa", datetime(2019, 5, 1), False),
+        ("South Africa", datetime(2019, 6, 16), False),
+        ("South Africa", datetime(2019, 8, 9), False),
+        ("South Africa", datetime(2019, 9, 24), False),
+        ("South Africa", datetime(2019, 12, 16), False),
+        ("South Africa", datetime(2019, 12, 25), False),
+        ("South Africa", datetime(2019, 12, 26), False),
+        ("South Africa", datetime(2019, 12, 27), True),
+        ("South Africa", datetime(2019, 12, 28), False),
+        ("South Africa", datetime(2019, 12, 29), False),
+        ("South Africa", datetime(2019, 12, 30), True),
+        ("South Africa", datetime(2019, 12, 31), True),
+    ],
+)
+def test_get_calendar(country, test_date, holiday_bool):
+    """Test the calendar objects based on the parametrization above."""
+    calendar = get_calendar(country)
+    assert calendar.is_on_offset(test_date) == holiday_bool
+
 
 @pytest.mark.parametrize("index, start_date, end_date, day_count_convention, year_fraction", read_csv('tests/unit tests/tools/day_count_test.csv'))
 def test_calculate_year_fraction(index, start_date, end_date, day_count_convention, year_fraction):

@@ -1,6 +1,37 @@
 import calendar
 from datetime import date
-from frml.input_helpers.tools import Dates
+import pandas as pd
+from frml.tools.calendars import CalendarMemory
+from frml.input_helpers.tools import (Calendars,
+                                        Dates)
+
+
+def get_calendar(country: Calendars.calendars) -> pd.offsets.CustomBusinessDay:
+    """
+    Function returns a calendar object for the country specified.
+
+    Parameters:
+        - country (str): The country for which the calendar is required.
+
+    returns:
+        - created_calendar (pd.offsets.CustomBusinessDay): A calendar object for the country
+            specified.
+
+    Notes:
+        - calendar objects only take into account holidays not based on the lunar calendar except for easter.
+
+    See Also:
+        - Calendars class to view the countries and which holidays they have.
+        - CalendarMemory class to view the calendars that have been created.
+    """
+    calendar_memory = CalendarMemory()
+    created_calendar = calendar_memory.calendar_instance_dictionary.get(country)
+    if created_calendar is None:
+        created_calendar = pd.offsets.CustomBusinessDay(
+            calendar=Calendars.calendar_sets[country]
+        )
+        calendar_memory.calendar_instance_dictionary[country] = created_calendar
+    return created_calendar
 
 def calculate_year_fraction(
     start_date: date,
