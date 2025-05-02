@@ -11,7 +11,7 @@ Version Entries: Each version entry should include:
 ---
 
 ## #2
-### Added []
+### Added 
 - Base financial date functionality
     - CalendarMemory
     - get_calendars
