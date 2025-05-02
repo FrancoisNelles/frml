@@ -94,7 +94,7 @@ def test_adjust_date_to_tenor_error_catching():
 
     with pytest.raises(ValueError):
         base_date = date(2022,1,1)
-        adjust_tenor = 1234
+        adjust_tenor = '1234'
         adjust_date_to_tenor(base_date, adjust_tenor)
 
 def test_adjust_date_to_month_end_error_catching():
@@ -204,6 +204,23 @@ def test_generate_dates_list_error_catching():
                                 business_day_convention,
                                 end_of_month)
     with pytest.raises(ValueError):
+        start_date = date(2022,1,31)
+        end_date = date(2022,1,1)
+        tenor = '1M'
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+
+        generate_dates_list(start_date,
+                                end_date,
+                                tenor,
+                                date_generation_method,
+                                calendar,
+                                business_day_convention,
+                                end_of_month)
+        
+    with pytest.raises(ValueError):
         start_date = date(2022,1,1)
         end_date = date(2022,1,31)
         tenor = '1Ms'
@@ -219,6 +236,24 @@ def test_generate_dates_list_error_catching():
                                 calendar,
                                 business_day_convention,
                                 end_of_month)
+        
+    with pytest.raises(ValueError):
+        start_date = date(2022,1,1)
+        end_date = date(2022,1,31)
+        tenor = '-1M'
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+
+        generate_dates_list(start_date,
+                                end_date,
+                                tenor,
+                                date_generation_method,
+                                calendar,
+                                business_day_convention,
+                                end_of_month)
+        
     with pytest.raises(ValueError):
         start_date = date(2022,1,1)
         end_date = date(2022,1,31)
@@ -235,6 +270,7 @@ def test_generate_dates_list_error_catching():
                                 calendar,
                                 business_day_convention,
                                 end_of_month)
+        
     with pytest.raises(ValueError):
         start_date = date(2022,1,1)
         end_date = date(2022,1,31)
@@ -251,6 +287,7 @@ def test_generate_dates_list_error_catching():
                                 calendar,
                                 business_day_convention,
                                 end_of_month)
+        
     with pytest.raises(ValueError):
         start_date = date(2022,1,1)
         end_date = date(2022,1,31)
@@ -260,13 +297,14 @@ def test_generate_dates_list_error_catching():
         business_day_convention = 'Unadjusteds'
         end_of_month = True
 
-    generate_dates_list(start_date,
-                                end_date,
-                                tenor,
-                                date_generation_method,
-                                calendar,
-                                business_day_convention,
-                                end_of_month)
+        generate_dates_list(start_date,
+                                    end_date,
+                                    tenor,
+                                    date_generation_method,
+                                    calendar,
+                                    business_day_convention,
+                                    end_of_month)
+        
     with pytest.raises(ValueError):
         start_date = date(2022,1,1)
         end_date = date(2022,1,31)

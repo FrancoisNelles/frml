@@ -414,9 +414,11 @@ def generate_dates_list(start_date: date,
     if not isinstance(end_date, date):
         raise TypeError(f"End date was not of type datetime.date, but rather of {type(end_date)}.")
     if start_date > end_date:
-        raise ValueError(f"Start date, {start_date}, cannot be after end date, {end_date}. Rather use a negative tenor.")
+        raise ValueError(f"Start date, {start_date}, cannot be after end date, {end_date}.")
     if tenor[-1] not in ["D", "W", "M", "Y"]:
         raise ValueError(f"Tenor {tenor} not recognized. Please provide a valid tenor value.")
+    if tenor[0] == '-':
+        raise ValueError(f"Tenor {tenor} cannot be negative. Please provide a valid tenor value.")
     if (date_generation_method not in Dates.date_generation_method_list):
         raise ValueError(f"Date generation method, {date_generation_method}, not recognized. Use any of {Dates.date_generation_method}.")
     if (calendar not in Calendars.calendar_list):
@@ -430,13 +432,11 @@ def generate_dates_list(start_date: date,
 
     if date_generation_method == "Backwards":
         start_date, end_date = end_date, start_date
-        if tenor[0] == '-':
-            tenor == tenor[1:]
-        else:
-            tenor = '-'+tenor
+        tenor = '-'+tenor
 
-        list_date = start_date
+    list_date = start_date
 
+    if date_generation_method == "Backwards":
         while list_date > end_date:
             dates_list.append(list_date)
             list_date = adjust_date(list_date,
@@ -446,9 +446,6 @@ def generate_dates_list(start_date: date,
                                     end_of_month)
             
     if date_generation_method == "Forwards":
-
-        list_date = start_date
-
         while list_date < end_date:
             dates_list.append(list_date)
             list_date = adjust_date(list_date,
