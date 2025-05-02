@@ -25,7 +25,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest
+          pytest --cov=frml --cov-report=html
 
   package:
     runs-on: ubuntu-latest

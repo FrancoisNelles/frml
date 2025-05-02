@@ -20,6 +20,7 @@
 - [ ] Code has been tested and passes all tests.
 - [ ] Notebooks have been updated to showcase intended use.
 - [ ] Documentation has been updated (if applicable).
+- [ ] Has the changelog been updated with the changes.
 - [ ] Changes have been reviewed.
 
 ## Review Instructions
