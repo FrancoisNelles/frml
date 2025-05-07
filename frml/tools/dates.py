@@ -63,8 +63,8 @@ def calculate_year_fraction(start_date: date,
             - 30/360A: American method, where the last day of February is considered to be the 30th only if the start date is on or after the 30th.
 
     """
-    if day_count not in Dates.day_count_list:
-        valid_conventions = ', '.join(Dates.day_count_list)
+    if day_count not in Dates.day_count_conventions_list:
+        valid_conventions = ', '.join(Dates.day_count_conventions_list)
         raise ValueError(f"DayCountConventions {day_count} does not exist. Use any of the following: {valid_conventions}")
     if not isinstance(start_date, date):
         raise TypeError(f"Start date {start_date} of type {type(start_date)} is not of type datetime.date.")

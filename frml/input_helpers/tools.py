@@ -64,11 +64,11 @@ class Dates:
                             Literal["30/360A"]
     ]
 
-    day_count_list = ["Actual/Actual",
-                        "Actual/365",
-                        "Actual/360",
-                        "30/360E",
-                        "30/360A"]
+    day_count_conventions_list = ["Actual/Actual",
+                                    "Actual/365",
+                                    "Actual/360",
+                                    "30/360E",
+                                    "30/360A"]
     
     # Date adjustment conditions
     business_day_convention = Literal[
