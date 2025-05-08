@@ -10,6 +10,7 @@ from frml.tools.dates import (adjust_date,
                                 adjust_date_to_tenor,
                                 calculate_year_fraction,
                                 generate_dates_list,
+                                generate_dates_list_with_stubs,
                                 get_calendar)
 
 def read_csv(file_path):
@@ -321,3 +322,23 @@ def test_generate_dates_list_error_catching():
                                 calendar,
                                 business_day_convention,
                                 end_of_month)
+        
+@pytest.mark.parametrize("start_date, end_date, tenor, front_stub_tenor_or_end_date, end_stub_tenor_or_start_date, date_generation_method, calendar, business_day_convention, end_of_month, generated_dates_list", read_csv('tests/unit tests/tools/generate_dates_list_with_stubs_test.csv'))
+def test_generate_dates_list_with_stubs(start_date, end_date, tenor, front_stub_tenor_or_end_date, end_stub_tenor_or_start_date, date_generation_method, calendar, business_day_convention, end_of_month, generated_dates_list):
+    start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+    end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+    front_stub_tenor_or_end_date = [None if front_stub_tenor_or_end_date == "None" else front_stub_tenor_or_end_date][0]
+    end_stub_tenor_or_start_date = [None if end_stub_tenor_or_start_date == "None" else end_stub_tenor_or_start_date][0]
+    if front_stub_tenor_or_end_date != None:
+        try:
+            front_stub_tenor_or_end_date = datetime.strptime(front_stub_tenor_or_end_date, '%Y-%m-%d').date()
+        except:
+            front_stub_tenor_or_end_date = front_stub_tenor_or_end_date
+    if end_stub_tenor_or_start_date != None:
+        try:
+            end_stub_tenor_or_start_date = datetime.strptime(end_stub_tenor_or_start_date, '%Y-%m-%d').date()
+        except:
+            end_stub_tenor_or_start_date = end_stub_tenor_or_start_date
+    end_of_month = [True if end_of_month == "True" else False][0]
+    generated_dates_list = [datetime.strptime(list_date, '%Y-%m-%d').date() for list_date in generated_dates_list.split("|")]
+    assert generate_dates_list_with_stubs(start_date, end_date, tenor, front_stub_tenor_or_end_date, end_stub_tenor_or_start_date, date_generation_method, calendar, business_day_convention, end_of_month) == generated_dates_list
