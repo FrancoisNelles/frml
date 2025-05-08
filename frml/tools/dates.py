@@ -389,8 +389,8 @@ def generate_dates_list(start_date: date,
             1W denotes 1 week
             1M denotes 1 month
             1Y denotes 1 year
-        - Forward denotes a short stub at the end of the list.
-        - Backward denotes a short stub at the beginning of the list.
+        - Forward denotes a short stub at the end of the list if start date and end date are not multiples of the tenor apart.
+        - Backward denotes a short stub at the beginning of the list if start date and end date are not multiples of the tenor apart.
         - Modified Following: The dates will be adjusted to the next business day if the
             date falls on a weekend or holiday unless the adjusted date would fall in
             another month, then it would use preceding.
@@ -459,7 +459,151 @@ def generate_dates_list(start_date: date,
     if date_generation_method == "Backwards":
         dates_list.reverse()
 
-    #Remove any duplicates
     dates_list = list(dict.fromkeys(dates_list))
 
     return dates_list
+
+
+def generate_dates_list_with_stubs(start_date: date,
+                                    end_date: date,
+                                    tenor: str,
+                                    front_stub_tenor_or_end_date: str|date|None,
+                                    end_stub_tenor_or_start_date: str|date|None,
+                                    date_generation_method: Dates.date_generation_method = "Backwards",
+                                    calendar: Calendars.calendars = "South Africa",
+                                    business_day_convention: Dates.business_day_convention = "Modified Following",
+                                    end_of_month: bool = False) -> list[date]:
+    """
+    This function creates a list of dates with a frequency and period being the tenor, with optional adjustments like a
+    a month end adjustment and a business day convention adjustment.
+
+    Parameters:
+        - start_date (date): The date at which the list should start.
+        - end_date (date): The date at which the list should end.
+        - tenor (str): The tenor the dates should be adjusted by.
+        - front_stub_tenor_or_end_date (str|date|None): A tenor or date which indicates the end of the front stub. The tenor should be positive.
+        - end_stub_tenor_or_start_date (str|date|None): A tenor or date which indicates the start of the end stub. The tenor should be positive.
+        - date_generation_method (Dates.date_generation_method): The date generation method of the date list.
+            The inputs are as follows:
+            Backwards
+            Forwards
+        - calendar (Calendars.calendars): The calendar for which the calendar is required.
+        - business_day_convention (Dates.business_day_convention): The business day convention of the date list.
+            The inputs are as follows:
+            Modified Following
+            Following
+            Modified Preceding
+            Preceding
+            Unadjusted
+        - end_of_month (boolean): True or False. If True, the dates will be adjusted to the
+            last day of the month.
+        
+
+    Returns:
+        - adjusted_date (list[date]): Returns a list of dates.
+
+    Usage:
+        - The list of dates generated follow the input ruleset.
+
+    Notes:
+        - Start date should be less than End date, for Date Generation logic.
+        - The tenor convention is as follows:
+            1D denotes 1 day
+            1W denotes 1 week
+            1M denotes 1 month
+            1Y denotes 1 year
+        - Forward denotes a short stub at the end of the list if start date and end date are not multiples of the tenor apart.
+        - Backward denotes a short stub at the beginning of the list if start date and end date are not multiples of the tenor apart.
+        - front_stub_tenor_or_end_date determines the interval of the first accrual period as the difference between the start date 
+            and the front stub end date. If None, works as generate_dates_list. If tenor is used, it should be a positive tenor.
+        - end_stub_tenor_or_start_date determines the interval of the first accrual period as the difference between the end stub 
+            start date and the end date. If None, works as generate_dates_list. If tenor is used, it should be a positive tenor.
+        - Modified Following: The dates will be adjusted to the next business day if the
+            date falls on a weekend or holiday unless the adjusted date would fall in
+            another month, then it would use preceding.
+        - Following: The dates will be adjusted to the next business day if the date falls
+            on a weekend.
+        - Modified Preceding: The dates will be adjusted to the previous business day if
+            the date falls on a weekend or holiday unless the adjusted date would fall in
+            another month, then it would use following.
+        - Preceding: The dates will be adjusted to the previous business day if the date
+            falls on a weekend.
+        - Unadjusted: The dates will not be adjusted if the date falls on a weekend.
+
+    See also:
+        - The 'Calendars' class to view the countries and which holidays they have.
+        - The 'Date' class to view the date generation method.
+        - The 'Date' class to view the business day conventions.
+        - The 'generate_dates_list' function for date list generation.
+    """
+    if not isinstance(start_date, date):
+        raise TypeError(f"Start date was not of type datetime.date, but of type {type(start_date)}.")
+    if not isinstance(end_date, date):
+        raise TypeError(f"End date was not of type datetime.date, but of type {type(end_date)}.")
+    if start_date > end_date:
+        raise ValueError(f"Start date, {start_date}, cannot be after end date, {end_date}.")
+    if not isinstance(front_stub_tenor_or_end_date, (str, date, None)):
+        raise TypeError(f"Front stub input was not the correct type, but of type {type(front_stub_tenor_or_end_date)}.")
+    if not isinstance(front_stub_tenor_or_end_date, str) and front_stub_tenor_or_end_date[0] == '-':
+        raise TypeError(f"Front stub tenor input was negative, use a positive tenor, {front_stub_tenor_or_end_date[1:]}.")
+    if front_stub_tenor_or_end_date < start_date:
+        raise ValueError(f"Start date, {start_date}, cannot be before front stub end date, {front_stub_tenor_or_end_date}.")
+    if not isinstance(front_stub_tenor_or_end_date, str) and front_stub_tenor_or_end_date[0] == '-':
+        raise TypeError(f"End stub tenor input was negative, use a positive tenor, {front_stub_tenor_or_end_date[1:]}.")
+    if not isinstance(end_stub_tenor_or_start_date, (str, date, None)):
+        raise TypeError(f"Front stub input was not the correct type, but of type {type(end_stub_tenor_or_start_date)}.")
+    if end_stub_tenor_or_start_date > end_date:
+        raise ValueError(f"End date, {end_date}, cannot be after end stub start date, {end_stub_tenor_or_start_date}.")
+    if tenor[-1] not in ["D", "W", "M", "Y"]:
+        raise ValueError(f"Tenor {tenor} not recognized. Please provide a valid tenor value.")
+    if tenor[0] == '-':
+        raise ValueError(f"Tenor {tenor} cannot be negative. Please provide a valid tenor value.")
+    if (date_generation_method not in Dates.date_generation_method_list):
+        raise ValueError(f"Date generation method, {date_generation_method}, not recognized. Use any of {Dates.date_generation_method}.")
+    if (calendar not in Calendars.calendar_list):
+        raise ValueError(f"Calendar {calendar} not recognized. Use any of {Calendars.calendar_list}.")
+    if (business_day_convention not in Dates.business_day_convention_list):
+        raise ValueError(f"Business day convention {business_day_convention} not recognized. Use any of {Dates.business_day_convention_list}.")
+    if (end_of_month not in [True, False]):
+        raise ValueError(f"End of the month setting {end_of_month} not recognized. It must be set to True or False.")
+    
+    front_stub_end_date = None
+    end_stub_start_date = None
+
+    if front_stub_tenor_or_end_date:
+        if isinstance(front_stub_tenor_or_end_date, str):
+            front_stub_end_date = adjust_date(start_date,
+                                                front_stub_tenor_or_end_date,
+                                                calendar,
+                                                business_day_convention,
+                                                end_of_month)    
+        else:
+            front_stub_end_date = front_stub_tenor_or_end_date
+
+    if end_stub_tenor_or_start_date:
+        if isinstance(end_stub_tenor_or_start_date, str):
+            end_stub_start_date = adjust_date(end_date,
+                                                '-'+end_stub_tenor_or_start_date,
+                                                calendar,
+                                                business_day_convention,
+                                                end_of_month)    
+        else:
+            end_stub_start_date = end_stub_tenor_or_start_date
+
+    list_start_date = [front_stub_end_date if front_stub_end_date else start_date]
+    list_end_date = [end_stub_start_date if end_stub_start_date else end_date]
+
+    list_dates = generate_dates_list(list_start_date,
+                                        list_end_date,
+                                        tenor,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+    
+    if front_stub_end_date:
+        list_dates = list_dates.insert(start_date, 0)
+    if end_stub_start_date:
+        list_dates = list_dates.insert(start_date, -1)
+
+    return list_dates
