@@ -541,22 +541,22 @@ def generate_dates_list_with_stubs(start_date: date,
         raise TypeError(f"End date was not of type datetime.date, but of type {type(end_date)}.")
     if start_date > end_date:
         raise ValueError(f"Start date, {start_date}, cannot be after end date, {end_date}.")
-    if not isinstance(front_stub_tenor_or_end_date, (str, date, type(None))):
-        raise TypeError(f"Front stub input was not the correct type, but of type {type(front_stub_tenor_or_end_date)}.")
-    if isinstance(front_stub_tenor_or_end_date, str) and front_stub_tenor_or_end_date[0] == '-':
-        raise TypeError(f"Front stub tenor input was negative, use a positive tenor, {front_stub_tenor_or_end_date[1:]}.")
-    if isinstance(front_stub_tenor_or_end_date, date) and front_stub_tenor_or_end_date < start_date:
-        raise ValueError(f"Start date, {start_date}, cannot be before front stub end date, {front_stub_tenor_or_end_date}.")
-    if isinstance(front_stub_tenor_or_end_date, str) and front_stub_tenor_or_end_date[0] == '-':
-        raise TypeError(f"End stub tenor input was negative, use a positive tenor, {front_stub_tenor_or_end_date[1:]}.")
-    if not isinstance(end_stub_tenor_or_start_date, (str, date, type(None))):
-        raise TypeError(f"Front stub input was not the correct type, but of type {type(end_stub_tenor_or_start_date)}.")
-    if isinstance(end_stub_tenor_or_start_date, date) and end_stub_tenor_or_start_date > end_date:
-        raise ValueError(f"End date, {end_date}, cannot be after end stub start date, {end_stub_tenor_or_start_date}.")
     if tenor[-1] not in ["D", "W", "M", "Y"]:
         raise ValueError(f"Tenor {tenor} not recognized. Please provide a valid tenor value.")
     if tenor[0] == '-':
         raise ValueError(f"Tenor {tenor} cannot be negative. Please provide a valid tenor value.")
+    if not isinstance(front_stub_tenor_or_end_date, (str, date, type(None))):
+        raise TypeError(f"Front stub input was not the correct type, but of type {type(front_stub_tenor_or_end_date)}.")
+    if isinstance(front_stub_tenor_or_end_date, str) and front_stub_tenor_or_end_date[0] == '-':
+        raise ValueError(f"Front stub tenor input was negative, use a positive tenor, {front_stub_tenor_or_end_date[1:]}.")
+    if isinstance(front_stub_tenor_or_end_date, date) and front_stub_tenor_or_end_date < start_date:
+        raise ValueError(f"Start date, {start_date}, cannot be before front stub end date, {front_stub_tenor_or_end_date}.")
+    if not isinstance(end_stub_tenor_or_start_date, (str, date, type(None))):
+        raise TypeError(f"End stub input was not the correct type, but of type {type(end_stub_tenor_or_start_date)}.")
+    if isinstance(end_stub_tenor_or_start_date, str) and end_stub_tenor_or_start_date[0] == '-':
+        raise ValueError(f"End stub tenor input was negative, use a positive tenor, {end_stub_tenor_or_start_date[1:]}.")
+    if isinstance(end_stub_tenor_or_start_date, date) and end_stub_tenor_or_start_date > end_date:
+        raise ValueError(f"End date, {end_date}, cannot be after end stub start date, {end_stub_tenor_or_start_date}.")
     if (date_generation_method not in Dates.date_generation_method_list):
         raise ValueError(f"Date generation method, {date_generation_method}, not recognized. Use any of {Dates.date_generation_method}.")
     if (calendar not in Calendars.calendar_list):

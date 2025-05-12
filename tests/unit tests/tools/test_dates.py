@@ -342,3 +342,294 @@ def test_generate_dates_list_with_stubs(start_date, end_date, tenor, front_stub_
     end_of_month = [True if end_of_month == "True" else False][0]
     generated_dates_list = [datetime.strptime(list_date, '%Y-%m-%d').date() for list_date in generated_dates_list.split("|")]
     assert generate_dates_list_with_stubs(start_date, end_date, tenor, front_stub_tenor_or_end_date, end_stub_tenor_or_start_date, date_generation_method, calendar, business_day_convention, end_of_month) == generated_dates_list
+
+def test_generate_dates_list_with_stubs_error_catching():
+    with pytest.raises(TypeError):
+        start_date = '2022,1,1'
+        end_date = date(2022,1,31)
+        tenor = '1M'
+        front_stub_tenor_or_end_date = None
+        end_stub_tenor_or_start_date = None
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+    with pytest.raises(TypeError):
+        start_date = date(2022,1,1)
+        end_date = '2022,1,31'
+        tenor = '1M'
+        front_stub_tenor_or_end_date = None
+        end_stub_tenor_or_start_date = None
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+    with pytest.raises(ValueError):
+        start_date = date(2022,1,31)
+        end_date = date(2022,1,1)
+        tenor = '1M'
+        front_stub_tenor_or_end_date = None
+        end_stub_tenor_or_start_date = None
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+    with pytest.raises(ValueError):
+        start_date = date(2022,1,1)
+        end_date = date(2022,1,31)
+        tenor = '1S'
+        front_stub_tenor_or_end_date = None
+        end_stub_tenor_or_start_date = None
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+    with pytest.raises(ValueError):
+        start_date = date(2022,1,1)
+        end_date = date(2022,1,31)
+        tenor = '-1W'
+        front_stub_tenor_or_end_date = None
+        end_stub_tenor_or_start_date = None
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+    with pytest.raises(TypeError):
+        start_date = date(2022,1,1)
+        end_date = date(2022,1,31)
+        tenor = '1M'
+        front_stub_tenor_or_end_date = 10
+        end_stub_tenor_or_start_date = None
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+    with pytest.raises(ValueError):
+        start_date = date(2022,1,1)
+        end_date = date(2022,1,31)
+        tenor = '1M'
+        front_stub_tenor_or_end_date = '-10D'
+        end_stub_tenor_or_start_date = None
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+    with pytest.raises(ValueError):
+        start_date = date(2022,1,1)
+        end_date = date(2022,1,31)
+        tenor = '1M'
+        front_stub_tenor_or_end_date = date(2021,1,1)
+        end_stub_tenor_or_start_date = None
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+    with pytest.raises(TypeError):
+        start_date = date(2022,1,1)
+        end_date = date(2022,1,31)
+        tenor = '1M'
+        front_stub_tenor_or_end_date = None
+        end_stub_tenor_or_start_date = 10
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+    with pytest.raises(ValueError):
+        start_date = date(2022,1,1)
+        end_date = date(2022,1,31)
+        tenor = '1M'
+        front_stub_tenor_or_end_date = None
+        end_stub_tenor_or_start_date = '-10D'
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+    with pytest.raises(ValueError):
+        start_date = date(2022,1,1)
+        end_date = date(2022,1,31)
+        tenor = '1M'
+        front_stub_tenor_or_end_date = None
+        end_stub_tenor_or_start_date = date(2023,1,31)
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+        
+    with pytest.raises(ValueError):
+        start_date = date(2022,1,1)
+        end_date = date(2022,1,31)
+        tenor = '1M'
+        front_stub_tenor_or_end_date = None
+        end_stub_tenor_or_start_date = None
+        date_generation_method = 'Forward'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+        
+    with pytest.raises(ValueError):
+        start_date = date(2022,1,1)
+        end_date = date(2022,1,31)
+        tenor = '1M'
+        front_stub_tenor_or_end_date = None
+        end_stub_tenor_or_start_date = None
+        date_generation_method = 'Forwards'
+        calendar = 'South Africas'
+        business_day_convention = 'Unadjusted'
+        end_of_month = True
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+        
+    with pytest.raises(ValueError):
+        start_date = date(2022,1,1)
+        end_date = date(2022,1,31)
+        tenor = '1M'
+        front_stub_tenor_or_end_date = None
+        end_stub_tenor_or_start_date = None
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusteds'
+        end_of_month = True
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
+        
+    with pytest.raises(ValueError):
+        start_date = date(2022,1,1)
+        end_date = date(2022,1,31)
+        tenor = '1M'
+        front_stub_tenor_or_end_date = None
+        end_stub_tenor_or_start_date = None
+        date_generation_method = 'Forwards'
+        calendar = 'South Africa'
+        business_day_convention = 'Unadjusted'
+        end_of_month = 'True'
+        generate_dates_list_with_stubs(start_date,
+                                        end_date,
+                                        tenor,
+                                        front_stub_tenor_or_end_date,
+                                        end_stub_tenor_or_start_date,
+                                        date_generation_method,
+                                        calendar,
+                                        business_day_convention,
+                                        end_of_month)
