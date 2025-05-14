@@ -56,7 +56,7 @@ def test_get_calendar_error_catching():
         get_calendar(calendar)
 
 
-@pytest.mark.parametrize("start_date, end_date, day_count_convention, year_fraction", read_csv('tests/unit tests/tools/day_count_test.csv'))
+@pytest.mark.parametrize("start_date, end_date, day_count_convention, year_fraction", read_csv('tests/tools/day_count_test.csv'))
 def test_calculate_year_fraction(start_date, end_date, day_count_convention, year_fraction):
     start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
     end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
@@ -164,7 +164,7 @@ def test_adjust_date_error_catching():
         adjust_date(base_date, tenor, calendar, business_day_convention, end_of_month)
 
 
-@pytest.mark.parametrize("start_date, end_date, tenor, date_generation_method, calendar, business_day_convention, end_of_month, generated_dates_list", read_csv('tests/unit tests/tools/generate_date_list_test.csv'))
+@pytest.mark.parametrize("start_date, end_date, tenor, date_generation_method, calendar, business_day_convention, end_of_month, generated_dates_list", read_csv('tests/tools/generate_date_list_test.csv'))
 def test_generate_dates_list(start_date, end_date, tenor, date_generation_method, calendar, business_day_convention, end_of_month, generated_dates_list):
     start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
     end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
@@ -323,7 +323,7 @@ def test_generate_dates_list_error_catching():
                                 business_day_convention,
                                 end_of_month)
         
-@pytest.mark.parametrize("start_date, end_date, tenor, front_stub_tenor_or_end_date, end_stub_tenor_or_start_date, date_generation_method, calendar, business_day_convention, end_of_month, generated_dates_list", read_csv('tests/unit tests/tools/generate_dates_list_with_stubs_test.csv'))
+@pytest.mark.parametrize("start_date, end_date, tenor, front_stub_tenor_or_end_date, end_stub_tenor_or_start_date, date_generation_method, calendar, business_day_convention, end_of_month, generated_dates_list", read_csv('tests/tools/generate_dates_list_with_stubs_test.csv'))
 def test_generate_dates_list_with_stubs(start_date, end_date, tenor, front_stub_tenor_or_end_date, end_stub_tenor_or_start_date, date_generation_method, calendar, business_day_convention, end_of_month, generated_dates_list):
     start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
     end_date = datetime.strptime(end_date, '%Y-%m-%d').date()

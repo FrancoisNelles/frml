@@ -11,6 +11,11 @@ Version Entries: Each version entry should include:
 ---
 
 ## #2
+### Changed
+- Renamed github workflow folder
+- updated location of pull request template
+
+## #2
 ### Added 
 - Base financial date functionality
     - CalendarMemory
