@@ -24,6 +24,5 @@ jobs:
 
       - name: Install pytest and Run unit tests
         run: |
-          uv pip install -r requirements_workflow.txt
           uv pip install .
           pytest --cov=frml --cov-report=html
