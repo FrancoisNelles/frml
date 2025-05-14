@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "frml"
+version = "0.1.0"
+description = "An open source financial risk management library"
+readme = "README.md"
+keywords = ["Financial Risk Management", "Risk", "Risk Management"]
+license = "MIT License"
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "pandas>=2.2.3",
+]
+authors = [
+  {name = "Francois Nelles", email = "FrancoisNelles+frml@gmail.com"},
+]
+maintainers = [
+  {name = "Francois Nelles", email = "FrancoisNelles+frml@gmail.com"}
+]
