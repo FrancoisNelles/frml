@@ -27,4 +27,5 @@ jobs:
 
       - name: Install pytest and Run unit tests
         run: |
+          uv pip install .
           uv run pytest --cov=frml --cov-report=html
