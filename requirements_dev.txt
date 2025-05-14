@@ -1,6 +1,4 @@
-pandas >= 2.2.3
-
-# Development
+# Development only
 jupyter >= 1.1.1
 pytest >= 8.3.5
 pytest-cov >= 6.1.1
